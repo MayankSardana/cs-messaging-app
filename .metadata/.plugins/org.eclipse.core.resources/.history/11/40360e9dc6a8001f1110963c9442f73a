@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Page</title>
+    <script>
+        function showAlert(uid) {
+            alert("UID: " + uid);
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h3>Available UIDs:</h3>
+        <ul>
+            <!-- Loop through 'list' and create a button for each UID -->
+            <li th:each="uid : ${list}">
+                <button type="button" 
+                        th:text="${uid}" 
+                        th:onclick="'showAlert(\'' + ${uid} + '\')'">
+                </button>
+            </li>
+        </ul>
+    </header>
+    
+    <main>
+        <form th:action="@{/agent/{id}(id=${id})}" th:object="${num}" method="post">
+            <label for="inputId">Enter UID:</label>
+            <input type="number" th:field="*{id}" id="inputId" name="id" required>
+            <button type="submit">Submit</button>
+        </form>
+    </main>
+	
+	<header>
+	        <h3>Available UIDs:</h3>
+	        <ul>
+	            <!-- Loop through 'list' and create a button for each UID -->
+	            <li th:each="uid : ${list2}">
+	                <button type="button" 
+	                        th:text="${uid}" 
+	                        th:onclick="'showAlert(\'' + ${uid} + '\')'">
+	                </button>
+	            </li>
+	        </ul>
+	    </header>
+    
+    <footer>
+		<form th:action="@{/agent/message/{id}(id=${id})}" th:object="${n}" method="post">
+		           <label for="inputId">Enter UID:</label>
+		           <input type="number" th:field="*{id}" id="inputId" name="id" required>
+		           <button type="submit">Start Chating</button>
+		       </form>
+    </footer>
+</body>
+</html>

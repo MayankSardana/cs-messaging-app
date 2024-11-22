@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thymeleaf Example</title>
+</head>
+<body>
+    <header>
+        <h3>Agent Messages:</h3>
+        <ul>
+            <li th:each="message : ${list}" th:text="${message.getUid()}"></li> <!-- Loop through 'list' messages -->
+        </ul>
+    </header>
+    
+    <main>
+        <h1>AGENT</h1>
+        <!-- Button with all associated messages -->
+        <button id="messageButton" type="button">
+            Messages: 
+            <span th:each="message : ${list}" 
+                  th:utext="' ' + ${message.getUid()} + ','">
+            </span>
+        </button>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 Thymeleaf Example</p>
+    </footer>
+</body>
+</html>

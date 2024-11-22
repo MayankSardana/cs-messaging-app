@@ -1,0 +1,85 @@
+package in.app.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import in.app.binding.Login;
+import in.app.binding.Uid;
+import in.app.entity.AgentPair;
+import in.app.entity.UserPair;
+
+@Controller
+public class MainController {
+    HashMap<Integer, Boolean> map = new HashMap<>();
+    HashMap<UserPair, Boolean> users = new HashMap<>();
+    HashMap<Integer, ArrayList<AgentPair>> agents = new HashMap<>();
+
+//    public MainController() {
+//        // Initializing map with some sample data
+//        map.put(1, false);
+//        map.put(2, false);
+//        map.put(3, false);
+//    }
+
+    @GetMapping("/")
+    public String loadPage(Model model) {
+        model.addAttribute("login", new Login());
+        return "index";
+    }
+
+    @GetMapping("/agent/{id}")
+    public String loadAgent(@PathVariable("id") Integer id, Model model) {
+        ArrayList<Integer> list = new ArrayList<>();
+        model.addAttribute("id", id);
+        model.addAttribute("num", new Uid());
+
+        for (Integer key : map.keySet()) {
+            if (!map.get(key)) {
+                list.add(key);
+            }
+        }
+
+        model.addAttribute("list", list);
+        return "agent";
+    }
+
+    @PostMapping("/agent/{id}")
+    public String loadedAgent(@PathVariable("id") Integer id, @ModelAttribute("num") Uid num, Model model) {
+        System.out.println("Received UID from form: " + num.getId());
+        if (num.getId() != null) {
+            if (map.containsKey(num.getId()) && !map.get(num.getId())) {
+                map.put(num.getId(), true);
+                System.out.println("UID " + num.getId() + " marked as true in the map.");
+            } else {
+                System.out.println("UID " + num.getId() + " is either invalid or already set to true.");
+            }
+        }
+        System.out.println("Updated map: " + map);
+        return "redirect:/agent/" + id;
+    }
+
+    @PostMapping("/")
+    public String loginPage(@ModelAttribute("login") Login login) {
+        if ("Agent".equals(login.getRole())) {
+            boolean exists = agents.containsKey(login.getId());
+            if (!exists) {
+                agents.put(login.getId(), new ArrayList<>());
+            }
+            return "redirect:/agent/" + login.getId();
+        } else {
+            UserPair user = new UserPair(login.getId());
+            if (!users.containsKey(user)) {
+                users.put(user, false);
+                map.put(user.getUid(), false);
+            }
+            return "redirect:/user/" + login.getId();
+        }
+    }
+}

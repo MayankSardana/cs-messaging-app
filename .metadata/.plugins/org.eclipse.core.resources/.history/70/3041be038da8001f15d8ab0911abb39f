@@ -1,0 +1,9 @@
+package in.app.binding;
+
+import lombok.Data;
+
+@Data
+public class Login {
+    String role;
+    Integer id;
+}

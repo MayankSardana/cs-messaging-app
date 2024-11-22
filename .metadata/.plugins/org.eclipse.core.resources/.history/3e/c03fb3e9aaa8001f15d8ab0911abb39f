@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input String Example</title>
+</head>
+<body>
+    <header>
+		
+    </header>
+
+    <main>
+        <!-- Form to submit the string -->
+       <h1>message wallah</h1>
+        </form>
+    </main>
+</body>
+</html>

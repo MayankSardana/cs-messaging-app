@@ -1,0 +1,90 @@
+package in.app.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import in.app.binding.Login;
+import in.app.entity.AgentPair;
+import in.app.entity.UserPair;
+
+@Controller
+public class MainController {
+    HashMap<UserPair, Boolean> users = new HashMap<>();
+    HashMap<Integer, ArrayList<AgentPair>> agents = new HashMap<>();
+
+    @GetMapping("/")
+    public String loadPage(Model model) {
+        model.addAttribute("login", new Login());
+        return "index";
+    }
+
+    @GetMapping("/agent/{id}")
+    public String loadAgent(@PathVariable("id") Integer id) {
+        return "agent";
+    }
+
+    @GetMapping("/user/{id}")
+    public String loadUser(@PathVariable("id") Integer id, Model model) {
+        return "user";
+    }
+
+    @PostMapping("/")
+    public String loginPage(@ModelAttribute("login") Login login) {
+        if (login.getRole().equals("Agent")) {
+            boolean check = false;
+            for (Integer i : agents.keySet()) {
+                if (i.equals(login.getId())) {
+                    check = true;
+                    break;
+                }
+            }
+            if (!check) {
+                boolean c = false;
+                for (UserPair user : users.keySet()) {
+                    if (user.getUid() == login.getId()) {
+                        c = true;
+                        break;
+                    }
+                }
+                if (!c) {
+                    agents.put(login.getId(), new ArrayList<>());
+                } else {
+                    return "redirect:/";
+                }
+            }
+            return "redirect:/agent/" + login.getId();
+        } else {
+            boolean check = false;
+            UserPair p = new UserPair(login.getId());
+            for (UserPair user : users.keySet()) {
+                if (user.getUid() == login.getId()) {
+                    check = true;
+                    p = user;
+                    break;
+                }
+            }
+            if (!check) {
+                boolean c = false;
+                for (Integer i : agents.keySet()) {
+                    if (i.equals(login.getId())) {
+                        c = true;
+                        break;
+                    }
+                }
+                if (!c) {
+                    users.put(p, false);
+                } else {
+                    return "redirect:/";
+                }
+            }
+            return "redirect:/user/" + login.getId();
+        }
+    }
+}

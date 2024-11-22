@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thymeleaf Example</title>
+    <script>
+        function showAlert(uid) {
+            alert("UID: " + uid);
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h3>Agent Messages:</h3>
+        <ul>
+            <!-- Loop through 'list' and create a button for each message -->
+            <li th:each="message : ${list}">
+                <button type="button" 
+                        th:text="${message.getUid()}" 
+                        th:onclick="'showAlert(\'' + ${message.getUid()} + '\')'">
+                </button>
+            </li>
+        </ul>
+    </header>
+    
+    <main>
+        <h1>AGENT</h1>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 Thymeleaf Example</p>
+    </footer>
+</body>
+</html>

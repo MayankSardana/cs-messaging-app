@@ -1,0 +1,10 @@
+package in.app.entity;
+
+import java.util.ArrayList;
+
+public class UserPair 
+{
+   Integer uid;
+   ArrayList<String> messages;
+
+}

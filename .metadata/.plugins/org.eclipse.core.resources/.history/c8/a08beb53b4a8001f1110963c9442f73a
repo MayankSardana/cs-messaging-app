@@ -1,0 +1,157 @@
+package in.app.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import in.app.binding.Login;
+import in.app.binding.Uid;
+import in.app.entity.AgentPair;
+import in.app.entity.UserPair;
+
+@Controller
+public class MainController {
+    HashMap<Integer, Boolean> map = new HashMap<>();
+    HashMap<UserPair, Boolean> users = new HashMap<>();
+    HashMap<Integer, ArrayList<AgentPair>> agents = new HashMap<>();
+
+    @GetMapping("/")
+    public String loadPage(Model model) {
+        model.addAttribute("login", new Login());
+        return "index";
+    }
+
+    @GetMapping("/agent/{id}")
+    public String loadAgent(@PathVariable("id") Integer id, Model model) {
+        ArrayList<Integer> list = new ArrayList<>();
+        ArrayList<Integer> list2 = new ArrayList<>();
+
+        model.addAttribute("id", id);
+        model.addAttribute("num", new Uid());
+        model.addAttribute("n", new Uid());
+
+        for (Integer gh : map.keySet()) {
+            if (!map.get(gh)) {
+                list.add(gh);
+            }
+        }
+
+        if (agents.containsKey(id)) {
+            ArrayList<AgentPair> p = agents.get(id);
+            for (AgentPair r : p) {
+                list2.add(r.getUid());
+            }
+        }
+
+        model.addAttribute("list2", list2);
+        model.addAttribute("list", list);
+        return "agent";
+    }
+
+    @PostMapping("/agent/{id}")
+    public String loadedAgent(@PathVariable("id") Integer id, @ModelAttribute("num") Uid num, Model model) {
+        model.addAttribute("n", new Uid());
+        if (num.getId() != null) {
+            for (Integer gh : map.keySet()) {
+                if (gh.equals(num.getId())) {
+                    ArrayList<AgentPair> pairs = agents.getOrDefault(id, new ArrayList<>());
+                    pairs.add(new AgentPair(gh));
+                    agents.put(id, pairs);
+                    map.put(gh, true);
+                }
+            }
+        }
+        return "redirect:/agent/" + id;
+    }
+
+    @PostMapping("/agent/message/{id}")
+    public String agentMessage(@PathVariable("id") Integer id, 
+                               @ModelAttribute("n") Uid n, 
+                               @RequestParam("inputString") String inputString, 
+                               Model model) {
+        model.addAttribute("u", new ArrayList<>());
+        model.addAttribute("a", new ArrayList<>());
+
+        for (UserPair user : users.keySet()) {
+            if (user.getUid() == n.getId()) {
+                model.addAttribute("u", user.getMessages());
+            }
+        }
+
+        ArrayList<AgentPair> agentPairs = agents.get(id);
+        if (agentPairs != null) {
+            for (AgentPair agent : agentPairs) {
+                if (agent.getUid() == id) {
+                    ArrayList<String> messages = agent.getMessages();
+                    messages.add(inputString);
+                    agent.setMessages(messages);
+                    model.addAttribute("a", messages);
+                }
+            }
+        }
+        return "message";
+    }
+
+    @GetMapping("/user/{id}")
+    public String loadUser(@PathVariable("id") Integer id, Model model) {
+        model.addAttribute("u", new ArrayList<>());
+        model.addAttribute("a", new ArrayList<>());
+        model.addAttribute("id", id);
+
+        for (UserPair user : users.keySet()) {
+            if (user.getUid() == id) {
+                if (!map.get(id)) {
+                    model.addAttribute("u", user.getMessages());
+                } else {
+                    model.addAttribute("u", user.getMessages());
+                    for (Integer agentId : agents.keySet()) {
+                        for (AgentPair p : agents.get(agentId)) {
+                            if (p.getUid() == id) {
+                                model.addAttribute("a", p.getMessages());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return "user";
+    }
+
+    @PostMapping("/user/{id}")
+    public String loadedUser(@PathVariable("id") Integer id, @RequestParam("inputString") String inputString) {
+        if (inputString != null) {
+            for (UserPair p : users.keySet()) {
+                if (p.getUid() == id) {
+                    ArrayList<String> messages = p.getMessages();
+                    messages.add(inputString);
+                    p.setMessages(messages);
+                }
+            }
+        }
+        return "redirect:/user/" + id;
+    }
+
+    @PostMapping("/")
+    public String loginPage(@ModelAttribute("login") Login login) {
+        if (login.getRole().equals("Agent")) {
+            if (!agents.containsKey(login.getId())) {
+                agents.put(login.getId(), new ArrayList<>());
+            }
+            return "redirect:/agent/" + login.getId();
+        } else {
+            UserPair newUser = new UserPair(login.getId());
+            if (!users.containsKey(newUser)) {
+                users.put(newUser, false);
+                map.put(newUser.getUid(), false);
+            }
+            return "redirect:/user/" + login.getId();
+        }
+    }
+}

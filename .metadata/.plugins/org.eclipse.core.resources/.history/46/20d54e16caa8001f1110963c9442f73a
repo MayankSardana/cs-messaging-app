@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header, footer, main {
+            padding: 20px;
+            text-align: center;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+        }
+        h3 {
+            margin-bottom: 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            display: inline-block;
+            margin: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        form {
+            margin: 20px auto;
+            max-width: 400px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        form button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function showAlert(uid) {
+            alert("UID: " + uid);
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h3>Available UIDs (Group 1):</h3>
+        <ul>
+            <!-- Loop through 'list' and create a button for each UID -->
+            <li th:each="uid : ${list}">
+                <button type="button" 
+                        th:text="${uid}" 
+                        th:onclick="'showAlert(\'' + ${uid} + '\')'">
+                </button>
+            </li>
+        </ul>
+    </header>
+    
+    <main>
+        <form th:action="@{/agent/{id}(id=${id})}" th:object="${num}" method="post">
+            <label for="inputId">Enter UID:</label>
+            <input type="number" th:field="*{id}" id="inputId" name="id" required>
+            <button type="submit">Submit</button>
+        </form>
+    </main>
+	
+    <header>
+        <h3>Available UIDs (Group 2):</h3>
+        <ul>
+            <!-- Loop through 'list2' and create a button for each UID -->
+            <li th:each="uid : ${list2}">
+                <button type="button" 
+                        th:text="${uid}" 
+                        th:onclick="'showAlert(\'' + ${uid} + '\')'">
+                </button>
+            </li>
+        </ul>
+    </header>
+    
+    <footer>
+        <form th:action="@{/agent/message/{id}(id=${id})}" th:object="${n}" method="post">
+            <label for="inputId">Enter UID:</label>
+            <input type="number" th:field="*{id}" id="inputId" name="id" required>
+            <button type="submit">Start Chatting</button>
+        </form>
+    </footer>
+</body>
+</html>

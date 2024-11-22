@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input String Example</title>
+</head>
+<body>
+    <header>
+       <p th:text="${a}"></p>
+	   <p th:text="${u}"></p>
+    </header>
+
+    <main>
+        <!-- Form to submit the string -->
+        <form th:action="@{/user/{id}(id=${id})}" method="post">
+            <label for="inputString">Type your Message :-</label>
+            <input type="text" id="inputString" name="inputString" required>
+            <button type="submit">Submit</button>
+        </form>
+    </main>
+</body>
+</html>

@@ -1,0 +1,135 @@
+package in.app.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import in.app.binding.Login;
+import in.app.entity.AgentPair;
+import in.app.entity.UserPair;
+
+@Controller
+public class MainController {
+
+    // HashMap to store UserPairs and their active status
+    private final HashMap<UserPair, Boolean> users = new HashMap<>();
+
+    // HashMap to store AgentPairs associated with an ID
+    private final HashMap<Integer, ArrayList<AgentPair>> agents = new HashMap<>();
+
+    @GetMapping("/")
+    public String loadPage(Model model) {
+        model.addAttribute("login", new Login());
+        return "index";
+    }
+
+    @GetMapping("/agent/{id}")
+    public String loadAgent(@PathVariable("id") Integer id) {
+        return "agent";
+    }
+
+    @GetMapping("/user/{id}")
+    public String loadUser(@PathVariable("id") Integer id, Model model) {
+        model.addAttribute("u", new ArrayList<>());
+        model.addAttribute("a", new ArrayList<>());
+        model.addAttribute("id", id);
+
+        for (UserPair user : users.keySet()) {
+            if (user.getUid() == id) {
+                Boolean isActive = users.get(user);
+                if (isActive == null || !isActive) {
+                    // User is inactive or not properly initialized
+                    return "user";
+                } else {
+                    // User is active
+                    model.addAttribute("u", user.getMessages());
+                    for (Integer i : agents.keySet()) {
+                        ArrayList<AgentPair> agentList = agents.get(i);
+                        for (AgentPair agent : agentList) {
+                            if (agent.getUid() == id) {
+                                model.addAttribute("a", agent.getMessages());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return "user";
+    }
+
+    @PostMapping("/user/{id}")
+    public String loadedUser(@PathVariable("id") Integer id,
+                             @RequestParam("inputString") String inputString, Model model) {
+        if (inputString != null) {
+            for (UserPair user : users.keySet()) {
+                if (user.getUid() == id) {
+                    ArrayList<String> messages = user.getMessages();
+                    messages.add(inputString);
+                    user.setMessages(messages);
+                    users.put(user, users.get(user)); // Update user status if needed
+                }
+            }
+        }
+        return "redirect:/user/" + id;
+    }
+
+    @PostMapping("/")
+    public String loginPage(@ModelAttribute("login") Login login) {
+        if (login.getRole().equals("Agent")) {
+            boolean check = false;
+            for (Integer i : agents.keySet()) {
+                if (i.equals(login.getId())) {
+                    check = true;
+                    break;
+                }
+            }
+            if (!check) {
+                boolean userExists = false;
+                for (UserPair user : users.keySet()) {
+                    if (user.getUid() == login.getId()) {
+                        userExists = true;
+                        break;
+                    }
+                }
+                if (!userExists) {
+                    agents.put(login.getId(), new ArrayList<>());
+                } else {
+                    return "redirect:/";
+                }
+            }
+            return "redirect:/agent/" + login.getId();
+        } else {
+            boolean check = false;
+            UserPair newUser = new UserPair(login.getId());
+            for (UserPair user : users.keySet()) {
+                if (user.getUid() == login.getId()) {
+                    check = true;
+                    newUser = user;
+                    break;
+                }
+            }
+            if (!check) {
+                boolean agentExists = false;
+                for (Integer i : agents.keySet()) {
+                    if (i.equals(login.getId())) {
+                        agentExists = true;
+                        break;
+                    }
+                }
+                if (!agentExists) {
+                    users.put(newUser, false); // Initialize new user with inactive status
+                } else {
+                    return "redirect:/";
+                }
+            }
+            return "redirect:/user/" + login.getId();
+        }
+    }
+}

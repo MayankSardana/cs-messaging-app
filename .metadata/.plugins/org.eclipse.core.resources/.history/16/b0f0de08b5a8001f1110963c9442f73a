@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent/User Messages</title>
+</head>
+<body>
+    <header>
+        <h3>Agent Messages:</h3>
+        <ul>
+            <li th:each="message : ${a}" th:text="${message}"></li>
+        </ul>
+
+        <h3>User Messages:</h3>
+        <ul>
+            <li th:each="message : ${u}" th:text="${message}"></li>
+        </ul>
+    </header>
+
+    <main>
+        <form th:action="@{/agent/message/{id}(id=${id})}" method="post">
+            <label for="inputString">Type your Message:</label>
+            <input type="text" id="inputString" name="inputString" required>
+            <button type="submit">Submit</button>
+        </form>
+    </main>
+</body>
+</html>

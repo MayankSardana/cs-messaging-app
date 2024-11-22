@@ -1,0 +1,11 @@
+package in.app.entity;
+
+import lombok.Data;
+
+@Data
+public class AgentPair 
+{
+    Integer uid;
+    
+    String[] messsages;
+}
